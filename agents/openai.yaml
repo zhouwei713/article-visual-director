@@ -1,0 +1,4 @@
+interface:
+  display_name: "文章视觉导演"
+  short_description: "制作公众号、X 和小红书文章视觉资产与教程图文"
+  default_prompt: "Use $article-visual-director to map an article's concrete inputs, actions, outputs, and boundaries into readable visuals for WeChat, X, or Xiaohongshu, preserve prompt or reference constraints, validate the prompt contract, and inspect the generated assets. For Xiaohongshu, produce covers, carousel assets, or HTML-first tutorial pages rendered to PNG; do not publish, log in, manage cookies, or run data operations."
