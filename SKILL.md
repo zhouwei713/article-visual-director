@@ -23,7 +23,7 @@ description: Plan and produce coordinated article covers, inline illustrations, 
 
 后续规则只能补充缺失信息，不能覆盖前面的硬约束。用户提供完整视觉提示词时，保存原文到 `source-prompt.md`，并进入 `prompt-led-cover` 路由。
 
-生成前建立 `requirements.json`，至少记录 `mode`、`aspect_ratio`、`style`、`visible_text`、`text_policy`、`exact_text`、`palette_policy` 和 `allow_textless_fallback`。提示词元数据和正文必须与它一致。
+生成前建立 `requirements.json`，至少记录 `mode`、`aspect_ratio`、`style`、`visible_text`、`text_policy`、`exact_text`、`palette_policy` 和 `allow_textless_fallback`。小红书任务额外记录 `narrative_voice`、`source_image_policy`、`source_image_count` 和 `forbidden_narration`。提示词元数据和正文必须与它一致。
 
 如果编译结果改变了用户指定的比例、主文字可见性、主风格、输出类型或禁止项，立即阻断生成并修正。禁止用“跨平台适配”“模型容易错字”“统一系列风格”或类似理由静默改变用户约束。
 
@@ -42,7 +42,7 @@ description: Plan and produce coordinated article covers, inline illustrations, 
 7. 制作正文配图时，读取 `references/illustration-archetypes.md`。
 8. 写任何成图提示词前，读取 `references/prompt-compiler.md`。
 9. 生成完成后，读取 `references/quality-gates.md` 并检查实际图片。
-10. 小红书封面或多页图文时，读取 `references/xiaohongshu-strategies.md`、`references/xiaohongshu-cover-archetypes.md` 和 `references/xiaohongshu-carousel-structures.md`。
+10. 小红书封面或多页图文时，读取 `references/xiaohongshu-strategies.md`、`references/xiaohongshu-cover-archetypes.md` 和 `references/xiaohongshu-carousel-structures.md`。使用 `xiaohongshu-tutorial` 时还要读取 `references/xiaohongshu-tutorial-html.md`。
 11. 只有在任务路由仍不明确时，读取 `references/examples.md`。
 
 ## 任务路由
@@ -66,6 +66,8 @@ description: Plan and produce coordinated article covers, inline illustrations, 
 用户同时提出封面和配图时，选择 `full-package`。用户只给出文章且没有说明任务范围时，优先询问要封面、正文配图还是完整视觉包。
 
 当用户指定小红书时，使用小红书专用路由。用户要求教程、步骤、方法、框架、工具对比或信息密集的知识卡片时，选择 `xiaohongshu-tutorial`，默认先制作 HTML 或 React 页面，再渲染为 PNG，不调用图片生成模型。`xiaohongshu-package` 只交付图片、提示词、页面计划、标题正文标签等文案元数据和检查结果，不执行发布。
+
+当小红书素材是用户本人或原作者的经历、教程、测评和复盘时，发布文案与图片内说明默认采用作者第一人称，直接表达“我做了什么、发现了什么、如何判断”。避免使用“文章里说到”“原文提到”“作者发现”等脱离作者身份的转述话术。只转换来源中确实发生的动作与结论，不把推断改写成亲历。第三方新闻、研究和引用资料继续保留必要归因。
 
 ## 交互规则
 
@@ -98,6 +100,8 @@ description: Plan and produce coordinated article covers, inline illustrations, 
 如果文章链接无法读取，请用户粘贴正文，或提供导出的 HTML、PDF、Markdown、Word 文件或截图。不要用未取得的正文继续假装分析。
 
 参考图片有本地路径时，记录准确路径和用途。对话图片没有可用路径时，从可见内容提取风格、配色和构图描述。只有文件真实存在时，才在提示词元数据中记录引用路径。
+
+小红书资料中包含截图、照片、图表或界面图片时，按文档顺序建立 `asset_manifest.json`，记录素材编号、来源位置、相邻解释文字、原始尺寸、内容用途、目标页面和裁切策略。教程步骤中的截图与对应解释优先放进同一张卡片，让读者在一页内看清操作对象、动作和结果。保留截图事实内容，禁止重绘界面、改写截图文字或修改数据。
 
 ### 2. 建立视觉简报
 
@@ -150,6 +154,8 @@ description: Plan and produce coordinated article covers, inline illustrations, 
 正文配图默认采用 `balanced` 密度，共三至五张。短文或单一观点文章可降为一至两张。每张配图都必须有明确的信息功能。
 
 小红书多页图文使用独立的页面计划。知识型文章默认五至八页，短内容可以使用三至五页，信息密集型内容可以扩展到九页。每页只承担一个主要任务，并记录 `page_role`、`information_answer`、`exact_text`、`visual_anchor`、`evidence`、`aspect_ratio` 和 `safe_crop_zone`。默认页面推进为：封面钩子、问题确认、核心观点、机制或步骤、案例或证据、边界或风险、行动建议、互动问题。页面数量必须服从文章信息量，禁止为了凑页数重复装饰。
+
+页面使用来源截图时，`evidence` 必须写出准确的素材编号和对应解释，不能只写“界面截图”。截图承担事实证据，标题、步骤、结论和标注由独立 HTML 图层承载。截图过长、空白过多或关键文字过小时，可以裁掉无关空白、拆成总览与局部、放大关键区域或增加页面，禁止压缩到手机端无法阅读。
 
 小红书封面和卡片默认使用 `3:4`，推荐输出尺寸为 `1080x1440`。可以按内容选择 `1:1` 方形卡片或 `16:9` 机制图，但必须在简报、计划、需求契约和提示词元数据中分别记录比例。封面额外记录 `click_hook`、`visual_anchor`、`information_density` 和 `thumbnail_readability`。
 
@@ -256,6 +262,8 @@ output: images/01-cover.png
 生成后必须打开并检查实际图片，按 `references/quality-gates.md` 完成缩略图、裁切、文字、内容、风格和人物质量检查。没有检查成图时，只能报告提示词或调用已完成，不能声称视觉质量通过。
 
 对于 `xiaohongshu-tutorial`，额外检查 HTML 页面是否存在文字溢出、字体回退异常、卡片重叠、流程断裂、SVG 图标缺失和本地资源加载失败，并检查 PNG 是否仍为准确的 3:4 比例、标题层级清楚、缩略图可读、正文信息完整。记录 HTML 源文件检查和 PNG 实际视觉检查两项结果。
+
+如果 `requirements.json` 的 `narrative_voice` 为 `author-first-person`，运行 `python -X utf8 scripts/check_xiaohongshu_copy.py <output-dir>`，检查发布文案和 HTML 可见文字中是否残留脱离作者身份的转述话术。使用来源截图时，还要逐页核对素材编号、解释文字、截图清晰度、裁切完整性和来源真实性。截图与说明对应错误、关键界面文字无法辨认或截图事实内容被改变时，直接判定失败。
 
 文字错误、裁切错误或构图失败时，创建新的提示词版本和新的图片文件。保留旧候选用于比较。禁止通过程序化覆盖方式修补错误文字。
 

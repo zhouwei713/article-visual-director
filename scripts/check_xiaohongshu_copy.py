@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+"""Check first-person Xiaohongshu copy for detached source narration."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from html.parser import HTMLParser
+from pathlib import Path
+
+
+DEFAULT_FORBIDDEN = [
+    "文章里说到",
+    "文章里提到",
+    "文章中提到",
+    "原文提到",
+    "原文说到",
+    "原文展示",
+    "作者提到",
+    "作者说到",
+    "作者发现",
+    "文中提到",
+    "文中展示",
+]
+
+
+class VisibleTextParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self._ignored_depth = 0
+        self.parts: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag in {"script", "style"}:
+            self._ignored_depth += 1
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in {"script", "style"} and self._ignored_depth:
+            self._ignored_depth -= 1
+
+    def handle_data(self, data: str) -> None:
+        if not self._ignored_depth:
+            self.parts.append(data)
+
+    def text(self) -> str:
+        return "\n".join(self.parts)
+
+
+def load_requirements(root: Path) -> dict:
+    path = root / "requirements.json"
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"COPY_VOICE_ERROR invalid requirements.json: {exc}") from exc
+
+
+def visible_text(path: Path) -> str:
+    content = path.read_text(encoding="utf-8-sig")
+    if path.suffix.lower() != ".html":
+        return content
+    parser = VisibleTextParser()
+    parser.feed(content)
+    return parser.text()
+
+
+def line_for_phrase(text: str, phrase: str) -> int:
+    return text[: text.index(phrase)].count("\n") + 1
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("output_dir", type=Path)
+    args = parser.parse_args()
+
+    root = args.output_dir.resolve()
+    requirements = load_requirements(root)
+    if requirements.get("narrative_voice") != "author-first-person":
+        print("COPY_VOICE_SKIP narrative_voice is not author-first-person")
+        return 0
+
+    configured = requirements.get("forbidden_narration", [])
+    forbidden = list(dict.fromkeys([*DEFAULT_FORBIDDEN, *configured]))
+
+    files: list[Path] = []
+    note = root / "note.md"
+    if note.exists():
+        files.append(note)
+    html_dir = root / "html"
+    if html_dir.exists():
+        files.extend(sorted(html_dir.rglob("*.html")))
+
+    failures: list[tuple[Path, int, str]] = []
+    for path in files:
+        text = visible_text(path)
+        for phrase in forbidden:
+            if phrase in text:
+                failures.append((path, line_for_phrase(text, phrase), phrase))
+
+    if failures:
+        print("COPY_VOICE_FAIL")
+        for path, line, phrase in failures:
+            print(f"{path.relative_to(root)}:{line}: {phrase}")
+        return 1
+
+    print(f"COPY_VOICE_PASS files={len(files)}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

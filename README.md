@@ -19,6 +19,8 @@ note.md
 brief.md
 plan.md
 requirements.json
+asset_manifest.json
+assets/*
 html/*.html
 images/*.png
 qa.md
@@ -33,6 +35,8 @@ qa.md
 | 封面只剩一句口号 | 从文章主张、冲突、视觉锚点和标题层级重新组织画面 |
 | 配图和文章内容脱节 | 映射具体输入、动作、输出、场景和边界 |
 | 小红书卡片文字不稳定 | 教程模式先制作 HTML 或 React 页面，再由浏览器导出 PNG |
+| 教程截图和说明分离 | 建立素材清单，把截图证据与对应解释放在同一页 |
+| 自述内容变成旁观转述 | 作者经历默认使用第一人称，并运行文案检查脚本 |
 | 多页图文像重复模板 | 为每页设置独立阅读任务、证据和视觉关系 |
 | 生成结果无法复核 | 保存需求契约、计划、源文件或提示词，并检查实际产物 |
 
@@ -58,6 +62,7 @@ qa.md
 | `xiaohongshu-cover` | 小红书 3:4 封面 |
 | `xiaohongshu-carousel` | 小红书多页图文与逐页资产 |
 | `xiaohongshu-tutorial` | HTML 或 React 教程页面与 3:4 PNG |
+| `xiaohongshu-package` | 封面、多页图文、文案元数据和质量检查 |
 | `prompt-only` | 可复制的完整提示词，不调用生图工具 |
 | `revision` | 保留已选视觉方向，修改指定维度 |
 
@@ -73,6 +78,10 @@ qa.md
 4. 分别检查 HTML 页面和最终 PNG 的文字、裁切、溢出、层级和缩略图可读性。
 
 该模式默认不调用图片生成模型，适合需要保留较多中文信息的教程内容。
+
+资料带有截图、照片、图表或界面图片时，Skill 会建立 `asset_manifest.json`。截图与对应解释优先放在同一页，长截图可以使用完整总览加局部放大。标题、编号和标注放在独立 HTML 图层中，原始截图里的界面、文字和数据保持不变。
+
+来源属于作者自己的经历、教程、测评或复盘时，图片说明和发布文案默认采用第一人称。第三方新闻、研究和引用资料继续保留必要归因。
 
 ## 安装
 
@@ -109,6 +118,12 @@ Copy-Item -Recurse -LiteralPath ".\article-visual-director" -Destination "$env:U
 使用 $article-visual-director 的 xiaohongshu-tutorial 模式，把这篇教程先做成信息丰富的 HTML 页面，再转换成 3:4 PNG。
 ```
 
+带来源截图的小红书教程：
+
+```text
+使用 $article-visual-director 的 xiaohongshu-tutorial 模式处理这篇教程。保留资料中的原始截图，把截图和对应解释放在同一页；长截图使用完整总览加局部放大；发布文案与图片说明使用作者第一人称。
+```
+
 只要提示词：
 
 ```text
@@ -124,6 +139,7 @@ Copy-Item -Recurse -LiteralPath ".\article-visual-director" -Destination "$env:U
 | `references/` | 平台策略、风格库、页面结构和质量规则 |
 | `scripts/validate_prompt_contract.py` | 校验图片提示词与需求契约 |
 | `scripts/render_html_pages.ps1` | 将教程 HTML 页面渲染为 PNG |
+| `scripts/check_xiaohongshu_copy.py` | 检查作者第一人称文案中的旁观转述话术 |
 
 ## 验证状态与边界
 
@@ -132,6 +148,7 @@ Copy-Item -Recurse -LiteralPath ".\article-visual-director" -Destination "$env:U
 1. `quick_validate.py` 结构校验通过。
 2. 发布校验包含 UTF8、BOM、敏感信息、凭据模式和文件清单检查。
 3. 教程 HTML 路线已用浏览器导出 1080×1440 PNG 并完成视觉检查。
+4. 已用带来源截图的教程验证素材清单、截图与解释同页、长截图总览加局部放大，以及作者第一人称检查。
 
 图片生成模型的审美质量取决于具体模型输出，提示词契约通过不等同于每张图片都自动通过视觉检查。Skill 只负责文章到视觉资产的规划、生成、渲染和检查，不包含发布自动化、账号登录、Cookie 管理、定时发布、数据采集或数据运营。
 
