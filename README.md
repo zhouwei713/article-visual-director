@@ -15,6 +15,7 @@
 Skill 会先建立视觉简报和页面计划，再按内容选择图像生成或 HTML 确定性渲染路线。教程型小红书默认输出：
 
 ```text
+index.html
 note.md
 brief.md
 plan.md
@@ -75,7 +76,8 @@ qa.md
 1. 先拆解文章信息，确定每页的标题、输入、动作、输出和边界。
 2. 使用 CSS、内嵌 SVG 和本地字体制作固定 1080×1440 页面。
 3. 通过浏览器导出准确 3:4 的 PNG。
-4. 分别检查 HTML 页面和最终 PNG 的文字、裁切、溢出、层级和缩略图可读性。
+4. 生成一个整体 `index.html`，集中展示文案、页面顺序、素材映射和导出状态。
+5. 分别检查 HTML 页面、最终 PNG 和整体交付页的文字、裁切、溢出、层级和缩略图可读性。
 
 该模式默认不调用图片生成模型，适合需要保留较多中文信息的教程内容。
 
@@ -140,6 +142,7 @@ Copy-Item -Recurse -LiteralPath ".\article-visual-director" -Destination "$env:U
 | `scripts/validate_prompt_contract.py` | 校验图片提示词与需求契约 |
 | `scripts/render_html_pages.ps1` | 将教程 HTML 页面渲染为 PNG |
 | `scripts/check_xiaohongshu_copy.py` | 检查作者第一人称文案中的旁观转述话术 |
+| `scripts/build_xiaohongshu_preview.py` | 生成包含文案、全部页面、素材映射和检查状态的整体交付页 |
 
 ## 验证状态与边界
 
