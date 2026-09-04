@@ -87,6 +87,31 @@ X Article 横幅，使用同一主题的宽幅构图建立文章入口：
 
 左图是 AI 封面，右图是同一图文包中的 HTML 内页。两者共享颜色、材质和标题气质，分别承担点击和信息阅读任务。
 
+## 视觉风格图谱
+
+当前 Skill 内置 7 种主风格。每种风格都有独立的视觉锚点、材质和适用任务，执行时会根据文章内容选择，让不同主题拥有相匹配的视觉语言。
+
+<table>
+<tr>
+<td width="50%"><img src="assets/examples/styles/human-story-editorial.png" alt="human-story-editorial 风格示例" width="340"><br><code>human-story-editorial</code><br>人物经历、文化观察和情绪观点。强调成年原创人物、真实环境光和未完成动作。</td>
+<td width="50%"><img src="assets/examples/styles/product-hero.png" alt="product-hero 风格示例" width="340"><br><code>product-hero</code><br>AI 工具、产品介绍和功能发布。强调一个产品主体、使用场景和输入到结果的视觉路径。</td>
+</tr>
+<tr>
+<td width="50%"><img src="assets/examples/styles/concept-metaphor.png" alt="concept-metaphor 风格示例" width="340"><br><code>concept-metaphor</code><br>行业判断、抽象观点和趋势分析。用一个可解释的隐喻承载尺度、方向或材质冲突。</td>
+<td width="50%"><img src="assets/examples/styles/warm-workbench-map.png" alt="warm-workbench-map 风格示例" width="340"><br><code>warm-workbench-map</code><br>教程、Skill、方法论和工作流。用暖白工作台、便签和路径标记把复杂步骤放进真实语境。</td>
+</tr>
+<tr>
+<td width="50%"><img src="assets/examples/styles/dark-system-pulse.png" alt="dark-system-pulse 风格示例" width="340"><br><code>dark-system-pulse</code><br>自动化、代码、基础设施和安全。用深灰设备、信号路径和少量强调色表现系统状态。</td>
+<td width="50%"><img src="assets/examples/styles/tactile-interface-collage.png" alt="tactile-interface-collage 风格示例" width="340"><br><code>tactile-interface-collage</code><br>内容生产、创意工具、媒体产品和社交传播。用纸张、透明片、界面和实体道具建立触觉层次。</td>
+</tr>
+<tr>
+<td width="50%"><img src="assets/examples/styles/high-concept-poster.png" alt="high-concept-poster 风格示例" width="340"><br><code>high-concept-poster</code><br>强观点、发布宣言和主文字驱动的海报。让短标题成为视觉核心，再用一个隐喻关系制造第二眼理解。</td>
+<td width="50%"></td>
+</tr>
+</table>
+
+需要多个平台或多页图文时，封面先确定主风格，内页继承颜色、字体气质、材质和图形语言，同时根据每页的信息任务改变构图关系。
+
 ## 适用场景
 
 支持以下平台和任务：
@@ -206,21 +231,11 @@ Copy-Item -Recurse -LiteralPath ".\article-visual-director" -Destination "$env:U
 | `agents/openai.yaml` | Codex 界面名称和默认调用词 |
 | `references/` | 平台策略、风格库、页面结构和质量规则 |
 | `assets/examples/` | README 使用的公开案例图 |
+| `assets/examples/styles/` | 7 种主风格的公开示例图 |
 | `scripts/validate_prompt_contract.py` | 校验图片提示词与需求契约 |
 | `scripts/render_html_pages.ps1` | 将教程 HTML 页面渲染为 PNG |
 | `scripts/check_xiaohongshu_copy.py` | 检查作者第一人称文案中的旁观转述话术 |
 | `scripts/build_xiaohongshu_preview.py` | 生成包含文案、全部页面、素材映射和检查状态的整体交付页 |
-
-## 验证状态与边界
-
-已执行：
-
-1. `quick_validate.py` 结构校验通过。
-2. 发布校验包含 UTF8、BOM、敏感信息、凭据模式和文件清单检查。
-3. 教程 HTML 内页路线已用浏览器导出 1080×1440 PNG 并完成视觉检查；AI 封面仍需在每次真实生成后单独完成视觉检查。
-4. 已用带来源截图的教程验证素材清单、截图与解释同页、长截图总览加局部放大，以及作者第一人称检查。
-
-图片生成模型的审美质量取决于具体模型输出，提示词契约通过不等同于每张图片都自动通过视觉检查。Skill 只负责文章到视觉资产的规划、生成、渲染和检查，不包含发布自动化、账号登录、Cookie 管理、定时发布、数据采集或数据运营。
 
 ## 设计理念
 
