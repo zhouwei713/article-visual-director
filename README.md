@@ -112,6 +112,31 @@ X Article 横幅，使用同一主题的宽幅构图建立文章入口：
 
 需要多个平台或多页图文时，封面先确定主风格，内页继承颜色、字体气质、材质和图形语言，同时根据每页的信息任务改变构图关系。
 
+## 封面结构图谱
+
+视觉风格决定画面的颜色、材质和光线，封面结构决定读者第一眼先看到什么。当前 Skill 内置 7 种封面结构，下面用现有案例展示它们的组织方式。图片是结构示例，同一结构可以换用不同主视觉风格。
+
+<table>
+<tr>
+<td width="50%"><img src="assets/examples/styles/product-hero.png" alt="single-hero 封面结构示例" width="340"><br><code>single-hero</code><br>让一个产品、装置、物体或人物占据视觉中心。适合产品发布、工具介绍和主题明确的文章。</td>
+<td width="50%"><img src="assets/examples/styles/human-story-editorial.png" alt="unfinished-moment 封面结构示例" width="340"><br><code>unfinished-moment</code><br>截取动作即将发生或刚刚发生的瞬间。适合人物故事、文化观察和情绪观点。</td>
+</tr>
+<tr>
+<td width="50%"><img src="assets/examples/styles/concept-metaphor.png" alt="conceptual-tension 封面结构示例" width="340"><br><code>conceptual-tension</code><br>用尺度、材质、方向或空间矛盾表达核心观点。适合行业判断、抽象机制和带有悖论的文章。</td>
+<td width="50%"><img src="assets/examples/styles/warm-workbench-map.png" alt="system-landscape 封面结构示例" width="340"><br><code>system-landscape</code><br>把流程或系统压缩成一个可读的工作台、装置剖面或控制中心，只在封面暗示系统全貌。</td>
+</tr>
+<tr>
+<td width="50%"><img src="assets/examples/styles/high-concept-poster.png" alt="editorial-system-landscape 封面结构示例" width="340"><br><code>editorial-system-landscape</code><br>把文章标题层级和电影化系统场景放在同一画面。适合开源项目、AI 基础设施和复杂工具。</td>
+<td width="50%"><img src="assets/examples/styles/tactile-interface-collage.png" alt="evidence-collage 封面结构示例" width="340"><br><code>evidence-collage</code><br>用少量截图、文件、实物和标注建立证据感。一个证据承担主角，其他元素负责辅助说明。</td>
+</tr>
+<tr>
+<td width="50%"><img src="assets/examples/article-cover-wechat-seedance.png" alt="title-space 封面结构示例" width="340"><br><code>title-space</code><br>让短标题与一个克制主体共享版式空间。适合标题本身有强冲击力的文章。</td>
+<td width="50%"></td>
+</tr>
+</table>
+
+选择时可以先判断文章需要哪种阅读入口，再叠加主视觉风格和小红书冲击机制。例如“产品发布”可以组合 `product-hero`、`single-hero` 和 `foreground-thrust`；“Skill 教程”可以组合 `warm-workbench-map`、`system-landscape` 和 `giant-type-perspective`；“强观点文章”可以组合 `high-concept-poster`、`conceptual-tension` 和 `single-metaphor`。
+
 ## 适用场景
 
 支持以下平台和任务：
