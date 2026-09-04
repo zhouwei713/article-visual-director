@@ -2,7 +2,13 @@
 
 ## 适用范围
 
-`xiaohongshu-tutorial` 用于步骤、方法、工具拆解、框架说明、教程和信息密集型图文。默认制作 HTML 或 React 页面，再通过浏览器导出 PNG。该路线不负责小红书登录、发布、定时发布、数据采集或数据运营。
+`xiaohongshu-tutorial` 用于步骤、方法、工具拆解、框架说明、教程和信息密集型图文。默认采用混合制作路线：封面根据视觉任务选择 AI 生图或 HTML，信息密集内页制作 HTML 或 React 页面，再通过浏览器导出 PNG。该路线不负责小红书登录、发布、定时发布、数据采集或数据运营。
+
+## 封面与内页分流
+
+封面先读取 `xiaohongshu-strategies.md` 和 `xiaohongshu-cover-archetypes.md`。人物行动、产品场景、概念张力、强透视、空间纵深和质感海报优先使用 `imagegen`；完整长标题、精确数字、表格、流程、截图标注和严格品牌版式优先使用 `html`。每项资产在 `requirements.json` 和 `plan.md` 中记录 `render_method`。
+
+AI 封面保存为 `prompts/01-cover.md` 和 `images/01-cover.png`，不要求存在 `html/01-cover.html`。内页继续保留独立 HTML 源文件，并导出同名 PNG。封面确定主色、字体气质、材质和图形语言后，内页将这些特征编译为本地 CSS 视觉 token。
 
 ## 页面内容合同
 
@@ -39,6 +45,20 @@
 ```
 
 第一人称只能覆盖来源中明确发生的事实。第三方新闻、研究、引用和他人案例保留归因。把视角写入 `requirements.json`，值使用 `author-first-person` 或 `attributed-source`。
+
+## 公开成图与内部审计分离
+
+封面和轮播卡片属于公开发布内容。可见文字只写读者需要理解的信息，例如问题、操作、结果、判断和真实使用边界。下面这些内容属于制作过程或交付审计，禁止进入公开图片：
+
+1. 附件是否包含原始图片、视频或独立文件。
+2. 截图来自哪里、素材编号是什么、证据等级如何。
+3. 某张图是示意、占位、待补素材或尚未验证。
+4. 渲染、生成、导出、脚本检查和质量验收状态。
+5. 本地路径、文件名、素材清单和内部处理说明。
+
+把这些信息写入 `asset_manifest.json`、`plan.md`、`qa.md` 或 `index.html` 的审阅区域。公开图片需要表达限制时，把内部说明改成读者可以采取的判断或动作。例如，把“轨迹示意不代表实际成片”改成“复杂肢体仍要逐帧检查”，把“附件没有提供视频文件”留在素材清单中，不在卡片上补一句解释。
+
+在 `requirements.json` 中使用 `public_image_forbidden_copy` 记录当前项目额外禁止出现在成图中的准确短语。运行 `scripts/check_xiaohongshu_copy.py` 时，脚本会扫描所有单页 HTML 的可见文字。
 
 ## 截图素材整合
 
@@ -86,22 +106,24 @@
 
 ## 视觉实现
 
-默认页面为 `1080x1440`，输出 PNG 宽高比为 `3:4`。HTML 页面应使用固定画布、清晰的安全边距和稳定的中文字体栈，例如 `"Microsoft YaHei", "Noto Sans CJK SC", sans-serif`。颜色、纸张、网格、便签和流程线可以用 CSS 与内嵌 SVG 表达，避免依赖远程字体、远程图片和网络接口。
+默认页面为 `1080x1440`，输出 PNG 宽高比为 `3:4`。HTML 内页和确定性封面应使用固定画布、清晰的安全边距和稳定的中文字体栈，例如 `"Microsoft YaHei", "Noto Sans CJK SC", sans-serif`。颜色、纸张、网格、便签和流程线可以用 CSS 与内嵌 SVG 表达，避免依赖远程字体、远程图片和网络接口。
 
 页面需要有明显的标题层级、信息分区、流程方向和视觉锚点。装饰元素不能覆盖正文，也不能占用主要信息区域。字数过多时优先拆页，保持正文卡片有足够行高和留白，不通过极小字号解决溢出。
 
 ## 渲染与验证
 
-1. 保存每页 HTML 源文件，保留可追溯的页面编号和输出文件名。
-2. 使用 `python -X utf8 scripts/build_xiaohongshu_preview.py <output-dir>` 生成根目录的 `index.html`，集中审阅发布文案、页面顺序、单页 HTML 和素材映射。
-3. 用真实浏览器以 `1080x1440` 视口加载每个单页 HTML。
-4. 导出 PNG 到 `images/`，文件名与页面计划和需求契约一致。
-5. 再次生成整体页，并使用 `--require-images` 校验所有页面都已有最终 PNG。
-6. 检查控制台、资源加载、页面溢出和元素重叠。
-7. 检查 PNG 的像素尺寸、准确比例、文字清晰度、裁切和缩略图可读性。
-8. 记录 HTML 检查、PNG 检查和整体交付页检查的独立结果。
-9. 使用作者第一人称时，运行 `python -X utf8 scripts/check_xiaohongshu_copy.py <output-dir>`。
-10. 使用来源截图时，检查截图清晰度、原始比例、关键内容裁切、素材与说明对应关系，以及截图事实内容是否保持原样。
+1. 为每个 `html` 页面保存独立源文件，保留可追溯的页面编号和输出文件名。
+2. 使用 AI 封面时，先保存封面提示词、通过契约检查、生成 `images/01-cover.png`，再检查实际成图。
+3. 使用 `python -X utf8 scripts/build_xiaohongshu_preview.py <output-dir>` 生成根目录的 `index.html`，集中审阅发布文案、页面顺序、AI 封面、单页 HTML 和素材映射。
+4. 用真实浏览器以 `1080x1440` 视口加载每个 HTML 页面。
+5. 把 HTML 页面导出为 PNG 到 `images/`，文件名与页面计划和需求契约一致。
+6. 再次生成整体页，并使用 `--require-images` 校验所有页面都已有最终 PNG。AI 封面可以只有 PNG 和提示词，预览脚本按 HTML 与图片文件名的合集识别完整页面序列。
+7. 检查控制台、资源加载、页面溢出和元素重叠。
+8. 检查全部 PNG 的像素尺寸、准确比例、文字清晰度、裁切和缩略图可读性。
+9. 分别记录 AI 封面检查、HTML 检查、PNG 检查和整体交付页检查。
+10. 使用作者第一人称时，运行 `python -X utf8 scripts/check_xiaohongshu_copy.py <output-dir>`。
+11. 使用来源截图时，检查截图清晰度、原始比例、关键内容裁切、素材与说明对应关系，以及截图事实内容是否保持原样。
+12. 检查公开图片中没有附件缺失、来源审计、证据等级、生成状态、文件路径和质量检查等制作说明。
 
 ## 整体交付预览页
 
@@ -110,7 +132,7 @@
 1. 发布标题、正文、标签和互动引导，并提供复制按钮。
 2. 全部页面的发布顺序、页面职责、来源素材和版式说明。
 3. 导出前的单页 HTML 预览，或导出后的最终 PNG。
-4. HTML 打开入口和单张 PNG 下载入口。
+4. 为存在 HTML 源文件的页面提供打开入口，并为全部页面提供单张 PNG 下载入口。
 5. 来源素材数量、目标页面和解释关系。
 6. `qa.md` 中的检查记录，以及 HTML、PNG 和页面数量状态。
 
@@ -141,12 +163,15 @@ xiaohongshu-tutorial/
   plan.md
   requirements.json
   asset_manifest.json
+  prompts/
+    01-cover.md
   assets/
     asset-01.png
   html/
     styles.css
-    01-cover.html
+    02-problem.html
   images/
     01-cover.png
+    02-problem.png
   qa.md
 ```

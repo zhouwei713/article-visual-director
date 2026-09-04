@@ -93,19 +93,27 @@ asset_type: xiaohongshu-cover
 platform: xiaohongshu
 aspect_ratio: 3:4
 mode: xiaohongshu-cover
+render_method: imagegen
 style: concept-metaphor
 archetype: conflict-hook
+impact_mechanism: scale-tension
 page_role: cover
 visual_anchor: "一个可在缩略图中识别的主要主体"
 click_hook: "文章最值得点击的具体冲突"
+hero_subject: "承担点击钩子的单一主体"
+decisive_action: "主体正在发生的关键动作或变化"
+depth_relation: "前景、中景和后景的尺度与遮挡关系"
+title_subject_interlock: "标题与主体的空间关系"
+safe_crop_zone: "关键元素距四边约百分之十"
+thumbnail_readability: "缩小后仍能读出标题、主体和内容类型"
 visible_text: true
-text_policy: editorial-hierarchy
-exact_text: ""
+text_policy: short-exact
+exact_text: "视觉短标题"
 output: images/01-cover.png
 ---
 ```
 
-小红书每张轮播卡片还必须在提示词中说明 `page_role`、`information_answer`、`visual_anchor`、`safe_crop_zone` 和本页唯一的主要阅读任务。封面提示词必须写出点击钩子、缩略图轮廓和信息密度，内页提示词必须写出文章证据、步骤关系或结果信号。
+小红书每张资产在需求契约和页面计划中记录 `render_method`。轮播卡片提示词还必须说明 `page_role`、`information_answer`、`visual_anchor`、`safe_crop_zone` 和本页唯一的主要阅读任务。AI 封面提示词必须写出 `impact_mechanism`、`hero_subject`、`decisive_action`、`depth_relation`、`title_subject_interlock`、点击钩子、缩略图轮廓和信息密度。内页提示词必须写出文章证据、步骤关系或结果信号。
 
 ## 文字策略
 
@@ -164,6 +172,9 @@ output: images/01-cover.png
 封面锚点：
 只设置一个主要视觉锚点，说明它与文章核心观点的关系。
 
+冲击机制：
+只选择巨字透视、图文咬合、近景推进、动作瞬间、尺度冲突或单一隐喻中的一种。写清主体、决定性动作、前中后景、尺度与遮挡，以及标题和主体如何共享空间。
+
 信息密度：
 说明主标题、数字、关键词、人物、产品或结果信号的层级，禁止随机小字和装饰性标签。
 
@@ -171,7 +182,7 @@ output: images/01-cover.png
 缩小后仍能辨认主标题、视觉主体和内容类型，顶部与底部保留安全边距。
 ```
 
-封面必须让第一眼识别主题，第二眼发现冲突、洞察或隐喻。禁止把正文段落复制进画面或提示词的小字系统。
+封面必须让第一眼识别主题，第二眼发现冲突、洞察或隐喻。使用 `imagegen` 直接生成中文时，视觉短标题优先控制在四至八个汉字，只保留一级主标题和确有必要的少量辅助文字。完整长标题必须逐字准确且用户不允许缩短时，优先切换为 `html`。禁止把正文段落复制进画面或提示词的小字系统。
 
 ## 高级概念海报补充
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check first-person Xiaohongshu copy for detached source narration."""
+"""Check Xiaohongshu copy for detached narration and internal production notes."""
 
 from __future__ import annotations
 
@@ -22,6 +22,27 @@ DEFAULT_FORBIDDEN = [
     "作者发现",
     "文中提到",
     "文中展示",
+]
+
+
+DEFAULT_PUBLIC_IMAGE_FORBIDDEN = [
+    "截图来自附件",
+    "图片来自附件",
+    "来自附件真实案例",
+    "附件没有提供",
+    "附件未提供",
+    "未提供独立文件",
+    "原始视频未单独提供",
+    "原始视频文件未单独提供",
+    "真实界面证据",
+    "真实节点关系",
+    "本页保留作者",
+    "轨迹只用于说明",
+    "轨迹仅作示意",
+    "轨迹示意不代表实际成片",
+    "素材缺失说明",
+    "来源审计",
+    "制作过程说明",
 ]
 
 
@@ -83,14 +104,18 @@ def main() -> int:
 
     configured = requirements.get("forbidden_narration", [])
     forbidden = list(dict.fromkeys([*DEFAULT_FORBIDDEN, *configured]))
+    configured_public = requirements.get("public_image_forbidden_copy", [])
+    public_forbidden = list(dict.fromkeys([*DEFAULT_PUBLIC_IMAGE_FORBIDDEN, *configured_public]))
 
     files: list[Path] = []
     note = root / "note.md"
     if note.exists():
         files.append(note)
+    html_files: list[Path] = []
     html_dir = root / "html"
     if html_dir.exists():
-        files.extend(sorted(html_dir.rglob("*.html")))
+        html_files = sorted(html_dir.rglob("*.html"))
+        files.extend(html_files)
 
     failures: list[tuple[Path, int, str]] = []
     for path in files:
@@ -99,10 +124,19 @@ def main() -> int:
             if phrase in text:
                 failures.append((path, line_for_phrase(text, phrase), phrase))
 
-    if failures:
+    public_failures: list[tuple[Path, int, str]] = []
+    for path in html_files:
+        text = visible_text(path)
+        for phrase in public_forbidden:
+            if phrase in text:
+                public_failures.append((path, line_for_phrase(text, phrase), phrase))
+
+    if failures or public_failures:
         print("COPY_VOICE_FAIL")
         for path, line, phrase in failures:
             print(f"{path.relative_to(root)}:{line}: {phrase}")
+        for path, line, phrase in public_failures:
+            print(f"{path.relative_to(root)}:{line}: public-image-meta: {phrase}")
         return 1
 
     print(f"COPY_VOICE_PASS files={len(files)}")

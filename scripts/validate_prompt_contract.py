@@ -27,6 +27,25 @@ FORBIDDEN_HIGH_CONCEPT_STYLES = {
     "system-landscape",
     "single-hero",
 }
+REQUIRED_XHS_AI_COVER_FIELDS = (
+    "impact_mechanism",
+    "visual_anchor",
+    "click_hook",
+    "hero_subject",
+    "decisive_action",
+    "depth_relation",
+    "title_subject_interlock",
+    "safe_crop_zone",
+    "thumbnail_readability",
+)
+XHS_IMPACT_MECHANISMS = {
+    "giant-type-perspective",
+    "type-subject-interlock",
+    "foreground-thrust",
+    "decisive-action",
+    "scale-tension",
+    "single-metaphor",
+}
 
 
 def parse_frontmatter(text: str) -> dict[str, str]:
@@ -87,6 +106,21 @@ def validate_prompt(contract: dict, path: Path) -> list[str]:
     mode = str(contract.get("mode", "")).strip()
     if mode and meta.get("mode", "") != mode:
         fail(errors, f"{path.name}: metadata mode does not match contract")
+
+    expected_render_method = str(contract.get("render_method", "")).strip()
+    if expected_render_method and meta.get("render_method", "") != expected_render_method:
+        fail(errors, f"{path.name}: metadata render_method does not match contract")
+
+    asset_type = meta.get("asset_type", "")
+    if asset_type == "xiaohongshu-cover" and expected_render_method == "imagegen":
+        for key in REQUIRED_XHS_AI_COVER_FIELDS:
+            if not meta.get(key, "").strip():
+                fail(errors, f"{path.name}: AI Xiaohongshu cover is missing {key}")
+        expected_impact = str(contract.get("impact_mechanism", "")).strip()
+        if expected_impact and meta.get("impact_mechanism", "") != expected_impact:
+            fail(errors, f"{path.name}: metadata impact_mechanism does not match contract")
+        if meta.get("impact_mechanism", "") not in XHS_IMPACT_MECHANISMS:
+            fail(errors, f"{path.name}: unsupported Xiaohongshu impact_mechanism")
 
     visible_text = bool(contract.get("visible_text", False))
     expected_policy = str(contract.get("text_policy", "")).strip()

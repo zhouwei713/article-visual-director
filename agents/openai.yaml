@@ -1,4 +1,4 @@
 interface:
   display_name: "文章视觉导演"
   short_description: "制作公众号、X 和小红书文章视觉资产与教程图文"
-  default_prompt: "Use $article-visual-director to turn an article into coordinated visuals for WeChat, X, or Xiaohongshu, preserve source screenshots when present, pair them with their explanations, render dense tutorials from HTML, and inspect the final assets without publishing or logging in."
+  default_prompt: "Use $article-visual-director to turn an article into coordinated visuals for WeChat, X, or Xiaohongshu, prefer an AI-generated cover unless exact text or strict layout requires deterministic rendering, preserve source screenshots when present, render dense tutorials from HTML, and inspect final assets without publishing or logging in."

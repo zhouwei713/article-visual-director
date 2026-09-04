@@ -1,6 +1,6 @@
 ---
 name: article-visual-director
-description: Plan and produce coordinated article covers, inline illustrations, concept posters, and visual packages for WeChat, X, and Xiaohongshu. Use for 公众号封面、小红书封面、小红书多页图文、教程型小红书 HTML 图文、文章配图、社交传播图、reference-matched covers, or prompt-led revisions. Preserve explicit aspect ratio, title hierarchy, text visibility, style, and prohibitions. For article visuals, map concrete inputs, actions, outputs, use cases, and risks into the image plan instead of generic labels. Save prompts or HTML sources, validate contracts, render raster images, and inspect actual outputs. Supports cover-only, prompt-led-cover, reference-led-cover, illustrations-only, full-package, xiaohongshu-cover, xiaohongshu-carousel, xiaohongshu-tutorial, xiaohongshu-package, prompt-only, and revision workflows.
+description: Plan and produce article covers, inline illustrations, concept posters, and visual packages for WeChat, X, and Xiaohongshu. Use for 公众号封面、小红书封面、多页图文、教程混合图文、文章配图、社交传播图、reference-matched covers, and prompt-led revisions. Prefer AI image generation for article covers when no special rendering requirement is given. Use HTML or React for exact long copy, dense data, strict screenshot fidelity, or precise user-requested layouts. Keep Xiaohongshu tutorial inner pages deterministic. Preserve aspect ratio, text visibility, title hierarchy, style, prohibitions, and article-specific inputs, actions, outputs, use cases, and risks. Save prompts or page sources, validate contracts, render raster images, and inspect outputs. Supports cover-only, prompt-led-cover, reference-led-cover, illustrations-only, full-package, xiaohongshu-cover, xiaohongshu-carousel, xiaohongshu-tutorial, xiaohongshu-package, prompt-only, and revision workflows.
 ---
 
 # 文章视觉导演
@@ -23,7 +23,7 @@ description: Plan and produce coordinated article covers, inline illustrations, 
 
 后续规则只能补充缺失信息，不能覆盖前面的硬约束。用户提供完整视觉提示词时，保存原文到 `source-prompt.md`，并进入 `prompt-led-cover` 路由。
 
-生成前建立 `requirements.json`，至少记录 `mode`、`aspect_ratio`、`style`、`visible_text`、`text_policy`、`exact_text`、`palette_policy` 和 `allow_textless_fallback`。小红书任务额外记录 `narrative_voice`、`source_image_policy`、`source_image_count` 和 `forbidden_narration`。提示词元数据和正文必须与它一致。
+生成前建立 `requirements.json`，至少记录 `mode`、`aspect_ratio`、`style`、`visible_text`、`text_policy`、`exact_text`、`palette_policy` 和 `allow_textless_fallback`。小红书任务按资产额外记录 `render_method`，并记录 `narrative_voice`、`source_image_policy`、`source_image_count`、`forbidden_narration` 和 `public_image_forbidden_copy`。AI 小红书封面还要记录 `impact_mechanism`、`hero_subject`、`decisive_action`、`depth_relation`、`title_subject_interlock`、`safe_crop_zone` 和 `thumbnail_readability`。`public_image_forbidden_copy` 使用需要从公开成图可见文字中排除的准确短语。提示词元数据和正文必须与它一致。
 
 如果编译结果改变了用户指定的比例、主文字可见性、主风格、输出类型或禁止项，立即阻断生成并修正。禁止用“跨平台适配”“模型容易错字”“统一系列风格”或类似理由静默改变用户约束。
 
@@ -58,22 +58,24 @@ description: Plan and produce coordinated article covers, inline illustrations, 
 | `full-package` | 主封面、正文配图、平台变体和全部提示词 |
 | `xiaohongshu-cover` | 小红书 3:4 主封面、封面提示词和缩略图检查 |
 | `xiaohongshu-carousel` | 小红书 3:4 多页图文、逐页内容结构、逐页提示词和图片 |
-| `xiaohongshu-tutorial` | 以 HTML 或 React 为源文件制作信息密集的小红书教程页，再渲染为 3:4 PNG，并生成整体交付预览页 |
-| `xiaohongshu-package` | 小红书封面、多页图文、发布文案元数据、整体交付预览页和完整质量检查 |
+| `xiaohongshu-tutorial` | 封面无特殊要求时优先 AI 生图，遇到精确排字或严格截图需求时切换确定性渲染；信息密集内页以 HTML 或 React 为源文件，再统一交付 3:4 PNG 和整体预览页 |
+| `xiaohongshu-package` | 小红书 AI 或确定性封面、多页图文、发布文案元数据、整体交付预览页和完整质量检查 |
 | `prompt-only` | 完整可复制提示词，不调用生图工具 |
 | `revision` | 保留已选视觉方向，只修改用户点名的维度 |
 
 用户同时提出封面和配图时，选择 `full-package`。用户只给出文章且没有说明任务范围时，优先询问要封面、正文配图还是完整视觉包。
 
-当用户指定小红书时，使用小红书专用路由。用户要求教程、步骤、方法、框架、工具对比或信息密集的知识卡片时，选择 `xiaohongshu-tutorial`，默认先制作 HTML 或 React 页面，再渲染为 PNG，不调用图片生成模型。`xiaohongshu-package` 只交付图片、提示词、页面计划、标题正文标签等文案元数据、整体交付预览页和检查结果，不执行发布。
+当用户指定小红书时，使用小红书专用路由。用户要求教程、步骤、方法、框架、工具对比或信息密集的知识卡片时，选择 `xiaohongshu-tutorial`。该路由按资产选择生成方式：封面先进入 `xiaohongshu-cover` 决策，适合人物行动、产品场景、概念张力、空间透视或质感海报时默认使用 AI 生图；步骤、数字、表格、流程、截图说明和风险边界等信息密集内页默认使用 HTML 或 React，再渲染为 PNG。`xiaohongshu-package` 只交付图片、提示词、页面计划、标题正文标签等文案元数据、整体交付预览页和检查结果，不执行发布。
 
 当小红书素材是用户本人或原作者的经历、教程、测评和复盘时，发布文案与图片内说明默认采用作者第一人称，直接表达“我做了什么、发现了什么、如何判断”。避免使用“文章里说到”“原文提到”“作者发现”等脱离作者身份的转述话术。只转换来源中确实发生的动作与结论，不把推断改写成亲历。第三方新闻、研究和引用资料继续保留必要归因。
+
+公开发布图片的可见文字只保留面向读者的标题、解释、操作、结果、判断和适用边界。素材来源、附件是否齐全、截图真实性、素材编号、证据等级、生成状态、检查结论、文件路径和制作过程属于内部审计信息，只写入 `asset_manifest.json`、`plan.md`、`qa.md` 或整体交付页的审阅区域，禁止排进封面与轮播图片。典型禁用话术包括“截图来自附件”“附件没有提供”“原始视频未单独提供”“真实界面证据”“本页保留作者测试结论”“轨迹仅作示意”和同类制作说明。需要提示读者限制时，改写成与使用决策直接相关的公开信息，例如“复杂肢体仍要逐帧检查”。
 
 ## 交互规则
 
 1. 用户提供参考图并要求接近参考图的视觉效果时，进入 `reference-led-cover`。如果同时提供完整提示词，完整提示词继续作为内容与硬约束协议。
 2. 用户提供完整提示词，或提示词中出现“高级概念海报”“核心主文字”“第一眼看到主题”“第二眼理解隐喻”等明确协议时，直接进入 `prompt-led-cover`，不重新选择主风格和文字策略。
-3. 当平台或视觉方向缺失时，只进行一次简短确认。给出三个编号方向，把推荐项放在第一位，并让用户可以回复数字。
+3. 当平台或视觉方向缺失时，只进行一次简短确认。先从文章中提取内容类型、核心主张、点击钩子、主要证据、视觉主体、标题长度和情绪，再推荐三个明确不同的封面方向。每个方向由一种主风格、一种封面结构和一种冲击机制组成，把推荐项放在第一位，并让用户可以回复数字。该次选择只决定封面主方向，内页自动继承封面的主色、字体行为、材质和图形语言。
 4. 当用户说“直接出图”“不用问”“自动决定”“按默认生成”或同义表达时，进入快速模式。说明采用的平台、比例、风格、配图密度和文字策略，然后继续。
 5. 当用户已经给出平台、比例和明确风格时，直接继续。
 6. 在同一任务的后续修改中，保留已选择的平台、构图、色彩、人物、场景和视觉语言，只修改用户点名的内容。
@@ -84,9 +86,9 @@ description: Plan and produce coordinated article covers, inline illustrations, 
 ```text
 发布位置：[平台或待选]
 
-1. [推荐方向]：[一句视觉主张]
-2. [方向二]：[一句视觉主张]
-3. [方向三]：[一句视觉主张]
+1. [推荐方向]：[主风格] + [封面结构] + [冲击机制]，[一句内容理由]
+2. [方向二]：[主风格] + [封面结构] + [冲击机制]，[一句内容理由]
+3. [方向三]：[主风格] + [封面结构] + [冲击机制]，[一句内容理由]
 
 回复平台和数字即可，也可以回复“自动决定”。
 ```
@@ -159,13 +161,19 @@ description: Plan and produce coordinated article covers, inline illustrations, 
 
 小红书封面和卡片默认使用 `3:4`，推荐输出尺寸为 `1080x1440`。可以按内容选择 `1:1` 方形卡片或 `16:9` 机制图，但必须在简报、计划、需求契约和提示词元数据中分别记录比例。封面额外记录 `click_hook`、`visual_anchor`、`information_density` 和 `thumbnail_readability`。
 
+小红书图文包按资产记录 `render_method`。允许值为 `imagegen` 或 `html`。封面还要记录 `impact_mechanism`、`hero_subject`、`decisive_action`、`depth_relation` 和 `title_subject_interlock`。每张封面只选择一种主风格、一种封面结构和一种冲击机制。
+
+封面默认渲染决策：当用户没有指定特殊渲染要求时，所有平台的文章封面优先使用 `imagegen`。优先把人物动作、产品使用场景、概念隐喻、尺度冲突、强透视、空间纵深、图文穿插、摄影、拼贴、纸雕、真实材质或电影化光线交给 AI 生图表达。直接在 AI 成图中呈现中文时，视觉短标题优先控制为四至八个汉字，只保留一级主标题和确有必要的少量辅助文字。
+
+以下特殊要求可以切换到 `html` 或其他确定性渲染：完整长标题必须逐字准确；数字、表格、参数、流程或多级文字承担主要信息；真实截图必须保持原样并需要精确标注；用户要求严格品牌版式或精确布局；当前图片模型无法稳定呈现必要文字。用户明确指定生成方式时，以用户选择为准。切换渲染方式时，仍需在 `requirements.json`、页面计划和提示词或页面源文件中记录实际 `render_method`。
+
 文字密集型页面可以选择确定性卡片渲染路线，例如 HTML 或 React 页面渲染后导出 PNG。该路线只用于保证标题、数字、表格和流程文字的可读性，不改变当前 Skill 的图片生成和视觉检查流程，也不引入发布或登录能力。
 
-当路由为 `xiaohongshu-tutorial` 时，确定性渲染路线升级为默认路线。教程页先写入 `html/`，使用 CSS、内嵌 SVG 和本地可用字体表达结构、流程、对比和边界，再通过浏览器导出 `images/` 中的 PNG。每页只承担一个主要问题，但必须同时呈现具体输入、关键动作、输出结果和适用边界。不要为了塞入更多文字而缩小字号，应通过增加页面或拆分模块保持移动端可读性。详细规则见 `references/xiaohongshu-tutorial-html.md`。
+当路由为 `xiaohongshu-tutorial` 时，确定性渲染是信息密集内页的默认路线。内页先写入 `html/`，使用 CSS、内嵌 SVG 和本地可用字体表达结构、流程、对比和边界，再通过浏览器导出 `images/` 中的 PNG。AI 封面保存完整提示词到 `prompts/01-cover.md`，直接生成 `images/01-cover.png`，不要求存在同名 HTML。每页只承担一个主要问题，但必须同时呈现具体输入、关键动作、输出结果和适用边界。不要为了塞入更多文字而缩小字号，应通过增加页面或拆分模块保持移动端可读性。详细规则见 `references/xiaohongshu-tutorial-html.md`。
 
 教程型小红书默认使用八至十二页。每个 Skill、方法或工具至少保留“解决什么、怎么用、交付什么、注意什么”四个信息块。路线总览页还要展示上游输出如何交给下游，行动页要给出读者可以立即执行的第一步。
 
-`xiaohongshu-tutorial` 和 `xiaohongshu-package` 默认在交付目录根部生成 `index.html`，集中展示发布标题、正文、标签、全部页面、页面顺序、导出状态、素材映射和质量检查。导出前可以在整体页中预览单页 HTML，导出后重新生成整体页并显示最终 PNG。整体页只承担审阅和交付，最终图片继续由独立页面源文件逐页渲染，禁止把一个超长总览页面直接切割成发布图片。使用 `python -X utf8 scripts/build_xiaohongshu_preview.py <output-dir>` 生成审阅版，全部 PNG 导出后使用 `--require-images` 生成并校验最终交付版。
+`xiaohongshu-tutorial` 和 `xiaohongshu-package` 默认在交付目录根部生成 `index.html`，集中展示发布标题、正文、标签、全部页面、页面顺序、导出状态、素材映射和质量检查。导出前可以在整体页中预览单页 HTML，导出后重新生成整体页并显示最终 PNG。整体页只承担审阅和交付，最终图片分别来自独立 HTML 页面源文件或经过契约检查的 AI 封面提示词，禁止把一个超长总览页面直接切割成发布图片。使用 `python -X utf8 scripts/build_xiaohongshu_preview.py <output-dir>` 生成审阅版，全部 PNG 导出后使用 `--require-images` 生成并校验最终交付版。
 
 整体交付预览页必须根据当前图文包动态调整视觉主题。每次生成或修改 `index.html` 时，重新读取 `requirements.json`、`brief.md`、`plan.md`、`qa.md`，并打开至少一张封面、一张机制或步骤页和一张风险或边界页，提取实际成图的主色、字体行为、材质、信息密度、圆角与线条语言。预览页的主背景、强调色、标题层级、状态标记、图片墙和详情区要与这些成图及文章内容属于同一视觉系统，不能沿用与当前包无关的通用白色图库或模板化后台风格。
 
@@ -192,17 +200,17 @@ description: Plan and produce coordinated article covers, inline illustrations, 
 
 ### 5. 建立输出目录
 
-文章有文件路径时，默认使用：
+除非用户明确指定其他路径，所有视觉资产、提示词、页面源文件、预览文件和质量报告，默认导出到当前任务的用户设置项目目录。不得因为输入文章位于 Downloads、桌面或其他目录，就把生成结果默认写回输入文件所在目录。只有用户明确指定输出路径时，才覆盖本规则。
+
+默认目录结构为：
 
 ```text
-{article-dir}/article-visuals/{topic-slug}/
+{user-project-dir}/article-visuals/{topic-slug}/
 ```
 
-输入是粘贴内容时，默认使用：
+其中 `{user-project-dir}` 是当前任务使用的用户设置项目目录。若运行环境没有提供项目目录，才回退到当前任务工作目录，并在完成报告中明确标注回退原因。
 
-```text
-{cwd}/article-visuals/{topic-slug}/
-```
+在执行任何路由前建立任务输出目录，确保 prompt-only、revision 和仅规划任务也有明确的产物位置。prompt-only 没有图片时，导出目录指向提示词和元数据的保存目录；没有生成本地文件时，也要在完成报告中给出本次任务的目标导出目录并说明原因。
 
 目录结构：
 
@@ -264,17 +272,17 @@ output: images/01-cover.png
 
 生成前必须确认提示词契约检查通过。用户要求可见文字时，禁止使用 `textless`、`reserved-title-zone` 或“画面不出现任何可见文字”作为替代策略，除非用户明确批准后续人工排字。
 
-当路由为 `xiaohongshu-tutorial` 时，HTML、React、CSS、Canvas 和内嵌 SVG 是页面源文件，不属于替代成图。必须先保存可复用的页面源文件，再使用浏览器渲染为最终 PNG。该路由默认不调用 `imagegen`，并且需要同时检查 HTML 页面和导出的 PNG。其他路由仍然禁止用 SVG、HTML、Canvas 或程序化绘图替代用户明确要求的位图生成。多张图片优先使用工具原生批量能力，其次并行调用，每批最多四张。渲染失败时只重试失败项一次。
+当路由为 `xiaohongshu-tutorial` 时，按 `render_method` 分别执行。`imagegen` 封面先保存完整提示词并通过契约检查，再调用图片生成工具；`html` 页面先保存可复用的 HTML、React、CSS、Canvas 或内嵌 SVG 源文件，再使用浏览器渲染为最终 PNG。两种产物进入同一个 `images/` 序列和整体交付页。其他路由仍然禁止用 SVG、HTML、Canvas 或程序化绘图替代用户明确要求的位图生成。多张图片优先使用工具原生批量能力，其次并行调用，每批最多四张。生成或渲染失败时只重试失败项一次。
 
 ### 8. 检查真实产物
 
 生成后必须打开并检查实际图片，按 `references/quality-gates.md` 完成缩略图、裁切、文字、内容、风格和人物质量检查。没有检查成图时，只能报告提示词或调用已完成，不能声称视觉质量通过。
 
-对于 `xiaohongshu-tutorial`，额外检查 HTML 页面是否存在文字溢出、字体回退异常、卡片重叠、流程断裂、SVG 图标缺失和本地资源加载失败，并检查 PNG 是否仍为准确的 3:4 比例、标题层级清楚、缩略图可读、正文信息完整。记录 HTML 源文件检查和 PNG 实际视觉检查两项结果。
+对于 `xiaohongshu-tutorial`，分别检查 AI 封面、HTML 内页和最终 PNG。AI 封面检查标题逐字准确、单一视觉焦点、冲击机制、主体与标题的空间关系、缩略图点击钩子和安全裁切；HTML 内页检查文字溢出、字体回退异常、卡片重叠、流程断裂、SVG 图标缺失和本地资源加载失败；全部 PNG 检查准确比例、标题层级、缩略图可读性和正文信息完整。分别记录 AI 封面实际视觉检查、HTML 源文件检查和 PNG 实际视觉检查。
 
-对于 `xiaohongshu-tutorial` 和 `xiaohongshu-package`，还要检查 `index.html` 能否显示完整发布文案、全部页面及正确顺序，页面数量是否与 `plan.md` 一致，PNG 和 HTML 链接是否有效，素材映射与 `asset_manifest.json` 是否一致。整体页只能标记真实存在的 PNG 为“已导出”。最终交付前运行 `python -X utf8 scripts/build_xiaohongshu_preview.py <output-dir> --require-images`，校验失败时保留审阅状态，不得声称完整交付通过。
+对于 `xiaohongshu-tutorial` 和 `xiaohongshu-package`，还要检查 `index.html` 能否显示完整发布文案、全部页面及正确顺序，页面数量是否与 `plan.md` 一致，PNG 链接和实际存在的 HTML 链接是否有效，素材映射与 `asset_manifest.json` 是否一致。AI 封面可以没有同名 HTML，但必须有经过契约检查的提示词和最终 PNG。整体页只能标记真实存在的 PNG 为“已导出”。最终交付前运行 `python -X utf8 scripts/build_xiaohongshu_preview.py <output-dir> --require-images`，校验失败时保留审阅状态，不得声称完整交付通过。
 
-如果 `requirements.json` 的 `narrative_voice` 为 `author-first-person`，运行 `python -X utf8 scripts/check_xiaohongshu_copy.py <output-dir>`，检查发布文案和 HTML 可见文字中是否残留脱离作者身份的转述话术。使用来源截图时，还要逐页核对素材编号、解释文字、截图清晰度、裁切完整性和来源真实性。截图与说明对应错误、关键界面文字无法辨认或截图事实内容被改变时，直接判定失败。
+如果 `requirements.json` 的 `narrative_voice` 为 `author-first-person`，运行 `python -X utf8 scripts/check_xiaohongshu_copy.py <output-dir>`，检查发布文案和 HTML 可见文字中是否残留脱离作者身份的转述话术。该脚本还要检查所有页面 HTML 的可见文字，阻止内部制作说明进入公开成图。使用来源截图时，还要逐页核对素材编号、解释文字、截图清晰度、裁切完整性和来源真实性。截图与说明对应错误、关键界面文字无法辨认或截图事实内容被改变时，直接判定失败。
 
 文字错误、裁切错误或构图失败时，创建新的提示词版本和新的图片文件。保留旧候选用于比较。禁止通过程序化覆盖方式修补错误文字。
 
@@ -291,6 +299,7 @@ output: images/01-cover.png
 5. 提示词契约检查状态和实际视觉检查状态
 6. 若文章文件允许修改，给出或插入相对路径 Markdown 图片引用
 7. 小红书教程或完整图文包额外给出整体交付预览页 `index.html`
+8. 导出目录（必填）：给出本次任务实际使用的绝对路径。该字段适用于所有路由和所有完成状态；如果生成失败、只交付提示词或发生目录回退，也要给出目录并说明对应状态。
 
 ## 修改纪律
 
