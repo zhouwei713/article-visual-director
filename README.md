@@ -50,6 +50,43 @@ qa.md
 
 封面直接呈现中文时，优先提炼四至八个汉字的视觉短标题。AI 封面还要检查标题逐字准确、主体动作、前中后景、冲击机制、安全裁切和百分之二十五缩略图可读性。
 
+## 案例图集
+
+下面是最近使用本 Skill 产出的案例图，用来展示不同任务的视觉组织方式。图片属于案例展示，不代表平台发布效果或传播结果。
+
+### 文章封面
+
+公众号封面，使用电影胶片、纸张和轨道表达视频提示词到拍摄方案的转换：
+
+<p><img src="assets/examples/article-cover-wechat-seedance.png" alt="公众号文章封面案例" width="820"></p>
+
+X Article 横幅，使用同一主题的宽幅构图建立文章入口：
+
+<p><img src="assets/examples/article-cover-x-seedance.png" alt="X Article 封面案例" width="820"></p>
+
+### 文章配图与概念海报
+
+正文配图把输入对象、三条工作路径和交付结果放在同一张图里：
+
+<p><img src="assets/examples/article-illustration-ai-office.png" alt="文章正文配图案例" width="820"></p>
+
+概念海报用模块拆分和光线路径表现复杂工具的结构关系：
+
+<p><img src="assets/examples/concept-poster-deepseek.png" alt="概念海报案例" width="820"></p>
+
+### 小红书图文
+
+小红书封面优先使用 AI 生图来承担第一眼冲击，信息密集内页使用确定性排版：
+
+<table>
+<tr>
+<td><img src="assets/examples/xiaohongshu-cover-seko.png" alt="小红书 AI 封面案例" width="330"></td>
+<td><img src="assets/examples/xiaohongshu-inner-seko.png" alt="小红书 HTML 内页案例" width="330"></td>
+</tr>
+</table>
+
+左图是 AI 封面，右图是同一图文包中的 HTML 内页。两者共享颜色、材质和标题气质，分别承担点击和信息阅读任务。
+
 ## 适用场景
 
 支持以下平台和任务：
@@ -168,6 +205,7 @@ Copy-Item -Recurse -LiteralPath ".\article-visual-director" -Destination "$env:U
 | `SKILL.md` | 入口说明、路由和核心工作流 |
 | `agents/openai.yaml` | Codex 界面名称和默认调用词 |
 | `references/` | 平台策略、风格库、页面结构和质量规则 |
+| `assets/examples/` | README 使用的公开案例图 |
 | `scripts/validate_prompt_contract.py` | 校验图片提示词与需求契约 |
 | `scripts/render_html_pages.ps1` | 将教程 HTML 页面渲染为 PNG |
 | `scripts/check_xiaohongshu_copy.py` | 检查作者第一人称文案中的旁观转述话术 |
