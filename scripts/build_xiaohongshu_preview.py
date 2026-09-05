@@ -60,7 +60,7 @@ def sample_image_tone(root: Path, pages: list[dict[str, Path | str | None]]) -> 
             with Image.open(image_path) as image:
                 thumb = image.convert("RGB")
                 thumb.thumbnail((24, 24))
-                pixels.extend(thumb.getdata())
+                pixels.extend(thumb.get_flattened_data() if hasattr(thumb, "get_flattened_data") else thumb.getdata())
         except (OSError, ValueError):
             continue
     if not pixels:
@@ -80,7 +80,7 @@ def infer_theme(requirements: dict, brief_values: dict[str, str], pages: list[di
     image_tone = sample_image_tone(root, pages)
     image_brightness = image_tone[0] if image_tone else None
 
-    dark_words = ("深色", "深海", "蓝黑", "dark", "terminal", "workbench", "开发者", "插件")
+    dark_words = ("深色", "深海", "蓝黑", "dark", "terminal")
     light_words = ("浅色", "纸张", "暖白", "生活方式", "portrait", "editorial")
     dark = any(word.lower() in signals for word in dark_words)
     if any(word.lower() in signals for word in light_words) and not any(word.lower() in signals for word in dark_words):
@@ -202,7 +202,41 @@ def relative_url(path: Path, root: Path) -> str:
     return "/".join(quote(part) for part in relative.split("/"))
 
 
+def load_delivery_pages(root: Path) -> list[dict]:
+    path = root / "delivery.json"
+    if not path.exists():
+        return []
+    delivery = load_json(path, {})
+    if not isinstance(delivery, dict) or not isinstance(delivery.get("pages"), list):
+        raise SystemExit("PREVIEW_ERROR delivery.json must contain a pages array")
+    pages = delivery["pages"]
+    for index, item in enumerate(pages, start=1):
+        if not isinstance(item, dict) or not str(item.get("asset_id", "")).strip():
+            raise SystemExit(f"PREVIEW_ERROR delivery.json page {index} needs asset_id")
+    return pages
+
+
 def find_pages(root: Path) -> list[dict[str, Path | str | None]]:
+    selection = load_delivery_pages(root)
+    if selection:
+        pages = []
+        ids = set()
+        for item in selection:
+            asset_id = item["asset_id"]
+            if asset_id in ids:
+                raise SystemExit(f"PREVIEW_ERROR duplicate asset_id: {asset_id}")
+            ids.add(asset_id)
+            page = {"stem": asset_id, "contract": item}
+            for key in ("html", "image"):
+                path = (root / item[key]).resolve() if item.get(key) else None
+                if path:
+                    try:
+                        path.relative_to(root.resolve())
+                    except ValueError:
+                        raise SystemExit("PREVIEW_ERROR selected file outside package")
+                page[key] = path if path and path.is_file() else None
+            pages.append(page)
+        return pages
     html_dir = root / "html"
     image_dir = root / "images"
     html_files = {
@@ -265,14 +299,17 @@ def render_page_card(
             f'<button class="image-button" data-full="{media_url}" data-name="{esc(stem)}">'
             f'<img src="{media_url}" alt="{esc(task)}" loading="eager"></button>'
         )
-        status = '<span class="badge final">已导出 PNG</span>'
-    else:
+        status = f'<span class="badge final">文件存在 · {esc(image_path.suffix[1:].upper())}</span>'
+    elif html_path:
         media_url = relative_url(html_path, root)
         media = (
             f'<iframe class="source-frame" src="{media_url}" title="{esc(task)}" loading="eager" scrolling="no" '
             f'data-width="{canvas_width}" data-height="{canvas_height}"></iframe>'
         )
         status = '<span class="badge draft">HTML 待导出</span>'
+    else:
+        media = '<p>所选文件缺失</p>'
+        status = '<span class="badge draft">待补文件</span>'
     links = []
     if html_path:
         links.append(f'<a href="{relative_url(html_path, root)}" target="_blank">打开 HTML</a>')
@@ -341,6 +378,40 @@ def build_html(root: Path, output: Path, require_images: bool) -> tuple[str, lis
         raise SystemExit("PREVIEW_ERROR no HTML pages or exported images found")
 
     warnings = []
+    for name in ("requirements.json", "brief.md", "plan.md", "asset_manifest.json", "qa.md"):
+        if not read_text(root / name).strip():
+            warnings.append(f"缺少必要记录：{name}")
+    for key in ("标题", "正文", "标签"):
+        if not note_sections.get(key):
+            warnings.append(f"发布文案缺少：{key}")
+    if not load_delivery_pages(root):
+        warnings.append("缺少 delivery.json 最终版本选择，当前为目录候选预览")
+    for page in pages:
+        selected = page.get("contract", {})
+        if selected:
+            dimensions = selected.get("dimensions")
+            if not isinstance(dimensions, list) or len(dimensions) != 2 or any(type(v) is not int or v <= 0 for v in dimensions):
+                warnings.append(f"缺少有效像素尺寸契约：{page['stem']}")
+            if not selected.get("html") and not selected.get("prompt"):
+                warnings.append(f"缺少所选源文件：{page['stem']}")
+            for source_key in ("html", "prompt"):
+                if selected.get(source_key):
+                    source = (root / selected[source_key]).resolve()
+                    if not source.is_relative_to(root.resolve()) or not source.is_file():
+                        warnings.append(f"所选源文件缺失或越界：{page['stem']}")
+        if page["image"]:
+            try:
+                from PIL import Image
+                with Image.open(page["image"]) as raster:
+                    raster.load()
+                    page["size"] = raster.size
+                expected = page.get("contract", {}).get("dimensions")
+                if expected and list(page["size"]) != expected:
+                    warnings.append(f"图片尺寸与契约不符：{page['stem']}")
+            except ImportError:
+                warnings.append("缺少 Pillow，无法验证图片解码与尺寸")
+            except (OSError, ValueError):
+                warnings.append(f"图片无法解码：{page['stem']}")
     html_count = sum(bool(page["html"]) for page in pages)
     image_count = sum(bool(page["image"]) for page in pages)
     if plan_rows and len(plan_rows) != len(pages):
@@ -389,12 +460,15 @@ def build_html(root: Path, output: Path, require_images: bool) -> tuple[str, lis
         prefix_match = re.match(r"^(\d+)", str(page["stem"]))
         key = str(int(prefix_match.group(1))) if prefix_match else str(index)
         plan = plan_by_number.get(key, plan_rows[index - 1] if index <= len(plan_rows) else {})
-        page_cards.append(render_page_card(page, index, plan, root, canvas_width, canvas_height))
+        width, height = page.get("size", (canvas_width, canvas_height))
+        page_cards.append(render_page_card(page, index, plan, root, width, height))
 
     qa_text = read_text(root / "qa.md")
-    status_label = "最终图片已齐" if image_count == len(pages) else "仍有页面待导出"
+    status_label = "文件检查通过，视觉验收请查看质量记录" if not warnings and image_count == len(pages) else "审阅中，尚未完成交付检查"
     warning_html = "".join(f"<li>{esc(item)}</li>" for item in warnings)
     theme_css = render_theme_css(theme)
+    if (root / "preview-theme.css").is_file():
+        theme_css += '<link rel="stylesheet" href="preview-theme.css">'
     document = f"""<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -476,6 +550,11 @@ def build_html(root: Path, output: Path, require_images: bool) -> tuple[str, lis
 </body>
 </html>
 """
+    document = document.replace("object-fit:cover", "object-fit:contain")
+    if output.parent != root:
+        import os
+        prefix = quote(os.path.relpath(root, output.parent).replace("\\", "/"), safe="/.") + "/"
+        document = re.sub(r'(href|src|data-full)="(?![a-z]+:|#|/)([^\"]+)"', lambda m: f'{m[1]}="{prefix}{m[2]}"', document)
     return document, warnings
 
 
@@ -498,12 +577,13 @@ def main() -> int:
         return 1
 
     document, warnings = build_html(root, output, args.require_images)
-    output.write_text(document, encoding="utf-8")
     pages = find_pages(root)
     image_count = sum(bool(page["image"]) for page in pages)
     if args.require_images and warnings:
         print(f"PREVIEW_FAIL pages={len(pages)} images={image_count} warnings={len(warnings)} output={output}")
         return 1
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(document, encoding="utf-8")
     print(f"PREVIEW_PASS pages={len(pages)} images={image_count} warnings={len(warnings)} output={output}")
     return 0
 

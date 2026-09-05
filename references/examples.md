@@ -1,5 +1,65 @@
 # 路由示例
 
+这些案例用于复现决策过程。成图案例见 README，具体内容仍以当前文章和用户约束为准。
+
+## 公众号 AI 封面配方
+
+输入：AI 视频提示词教程，核心关系是文字指令逐步变成镜头、动作和拍摄方案。
+
+决策：`cover-only`，公众号 `2.35:1`，`editorial-system-landscape` 结构，电影化编辑视觉。画面用纸页、胶片、摄影轨道和暖色放映光表达转换，短标题使用“提示词变成拍摄方案”。
+
+契约要点：
+
+```json
+{
+  "mode": "cover-only",
+  "platform": "wechat",
+  "asset_type": "cover",
+  "aspect_ratio": "2.35:1",
+  "style": "high-concept-poster",
+  "visible_text": true,
+  "text_policy": "editorial-hierarchy",
+  "exact_text": "提示词变成拍摄方案",
+  "visual_mode": "cinematic-editorial-tech",
+  "allow_textless_fallback": false
+}
+```
+
+预期结果：第一眼识别标题和影视生产语境，第二眼看懂从提示词到镜头序列的关系。禁止缩成一台泛化电脑或一句口号。
+
+## 小红书 AI 封面与教程内页配方
+
+输入：中文短剧制作海外版的个人复盘，核心钩子是普通创作者通过 AI 完成跨语言改造。
+
+决策：`xiaohongshu-tutorial`，封面用 `imagegen` 表达人物行动、画面转换和跨文化张力，内页用 HTML 承载步骤、对比、截图解释与边界。发布文案使用 `author-first-person`。
+
+封面契约要点：
+
+```json
+{
+  "mode": "xiaohongshu-cover",
+  "platform": "xiaohongshu",
+  "asset_type": "xiaohongshu-cover",
+  "render_method": "imagegen",
+  "aspect_ratio": "3:4",
+  "visible_text": true,
+  "text_policy": "short-exact",
+  "exact_text": "短剧出海 没有门槛了",
+  "impact_mechanism": "type-subject-interlock",
+  "allow_textless_fallback": false
+}
+```
+
+预期结果：封面承担点击钩子，内页按问题、步骤、证据、结果和风险分工。截图事实保持原样，制作说明只进入交付记录。
+
+## 观点型概念海报配方
+
+输入：讨论一个系统如何把分散能力连接成稳定工作流。核心关系是孤立模块通过唯一通路形成闭环。
+
+决策：`cover-only`，`high-concept-poster` 风格，`conceptual-tension` 结构。使用一个断开的巨大环和穿过缺口的明亮路径，文字与缺口共享视觉重心。
+
+预期结果：去掉标题后仍能读出连接、缺口和闭环。画面不依赖工作台、发光电脑或功能列表。
+
 ## 公众号完整视觉包
 
 用户请求：
@@ -65,4 +125,3 @@
 路由：`revision`
 
 保留主体、场景、层级、镜头和留白，只修改配色与标题字段。生成新版本，保留旧候选。
-

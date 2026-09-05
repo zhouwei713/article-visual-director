@@ -53,10 +53,14 @@ class VisibleTextParser(HTMLParser):
         self.parts: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag in {"p", "div", "section", "li", "br", "h1", "h2", "h3"}:
+            self.parts.append("\n")
         if tag in {"script", "style"}:
             self._ignored_depth += 1
 
     def handle_endtag(self, tag: str) -> None:
+        if tag in {"p", "div", "section", "li", "h1", "h2", "h3"}:
+            self.parts.append("\n")
         if tag in {"script", "style"} and self._ignored_depth:
             self._ignored_depth -= 1
 
@@ -65,7 +69,7 @@ class VisibleTextParser(HTMLParser):
             self.parts.append(data)
 
     def text(self) -> str:
-        return "\n".join(self.parts)
+        return "".join(self.parts)
 
 
 def load_requirements(root: Path) -> dict:
@@ -98,12 +102,11 @@ def main() -> int:
 
     root = args.output_dir.resolve()
     requirements = load_requirements(root)
-    if requirements.get("narrative_voice") != "author-first-person":
-        print("COPY_VOICE_SKIP narrative_voice is not author-first-person")
-        return 0
 
     configured = requirements.get("forbidden_narration", [])
     forbidden = list(dict.fromkeys([*DEFAULT_FORBIDDEN, *configured]))
+    if requirements.get("narrative_voice") != "author-first-person":
+        forbidden = []
     configured_public = requirements.get("public_image_forbidden_copy", [])
     public_forbidden = list(dict.fromkeys([*DEFAULT_PUBLIC_IMAGE_FORBIDDEN, *configured_public]))
 
@@ -117,6 +120,9 @@ def main() -> int:
         html_files = sorted(html_dir.rglob("*.html"))
         files.extend(html_files)
 
+    if not files:
+        print("COPY_VOICE_FAIL no note.md or HTML files to inspect")
+        return 1
     failures: list[tuple[Path, int, str]] = []
     for path in files:
         text = visible_text(path)
@@ -125,7 +131,7 @@ def main() -> int:
                 failures.append((path, line_for_phrase(text, phrase), phrase))
 
     public_failures: list[tuple[Path, int, str]] = []
-    for path in html_files:
+    for path in files:
         text = visible_text(path)
         for phrase in public_forbidden:
             if phrase in text:

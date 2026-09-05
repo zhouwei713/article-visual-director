@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -52,34 +53,55 @@ def parse_frontmatter(text: str) -> dict[str, str]:
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
         return {}
+    try:
+        end = next(index for index, line in enumerate(lines[1:], start=1) if line.strip() == "---")
+    except StopIteration as error:
+        raise ValueError("frontmatter is not closed") from error
     values: dict[str, str] = {}
-    for line in lines[1:]:
-        if line.strip() == "---":
-            break
-        if ":" not in line:
+    for line in lines[1:end]:
+        if not line.strip() or line.lstrip().startswith("#") or line[:1].isspace():
             continue
+        if ":" not in line:
+            raise ValueError(f"invalid frontmatter line: {line}")
         key, value = line.split(":", 1)
-        values[key.strip()] = value.strip().strip('"').strip("'")
+        key = key.strip()
+        if key in values:
+            raise ValueError(f"duplicate frontmatter field: {key}")
+        values[key] = value.strip().strip('"').strip("'")
     return values
+
+
+def prompt_body(text: str) -> str:
+    match = re.match(r"\A---\s*\n.*?\n---\s*(?:\n|$)", text, re.S)
+    return text[match.end():] if match else text
 
 
 def fail(errors: list[str], message: str) -> None:
     errors.append(message)
 
 
-def contract_for_prompt(contract: dict, path: Path) -> dict:
+def contract_for_prompt(contract: dict, path: Path, root: Path | None = None) -> dict:
     """Merge a shared contract with the asset-specific entry, when present."""
     assets = contract.get("assets")
     if not assets:
         return contract
     merged = {key: value for key, value in contract.items() if key != "assets"}
+    matches = []
     for asset in assets:
         if not isinstance(asset, dict):
             continue
-        names = {str(asset.get("prompt", "")), str(asset.get("output", ""))}
-        if path.name in names or path.as_posix() in names:
-            merged.update(asset)
-            return merged
+        name = str(asset.get("prompt", "")).replace("\\", "/")
+        candidate = str(path).replace("\\", "/")
+        matched = bool(name) and (candidate == name or candidate.endswith("/" + name))
+        if root is not None and name and "/" in name:
+            matched = (root / name).resolve() == path.resolve()
+        if matched:
+            matches.append(asset)
+    if len(matches) == 1:
+        merged.update(matches[0])
+        return merged
+    if len(matches) > 1:
+        raise ValueError(f"ambiguous asset contract for {path}")
     raise ValueError(f"no asset contract matches {path}")
 
 
@@ -87,9 +109,22 @@ def validate_prompt(contract: dict, path: Path) -> list[str]:
     errors: list[str] = []
     text = path.read_text(encoding="utf-8")
     lower = text.lower()
-    meta = parse_frontmatter(text)
+    try:
+        meta = parse_frontmatter(text)
+    except ValueError as error:
+        fail(errors, f"{path.name}: {error}")
+        return errors
+    body = prompt_body(text)
+    for key in ("visible_text", "allow_textless_fallback"):
+        if key in contract and not isinstance(contract[key], bool):
+            fail(errors, f"contract: {key} must be a JSON boolean")
+    if meta.get("visible_text", "").lower() not in {"true", "false"}:
+        fail(errors, f"{path.name}: visible_text must be true or false")
+    for key in ("asset_type", "platform"):
+        if contract.get(key) and meta.get(key) != contract[key]:
+            fail(errors, f"{path.name}: metadata {key} does not match contract")
 
-    for key in ("mode", "style", "aspect_ratio", "visible_text", "text_policy"):
+    for key in ("asset_id", "mode", "asset_type", "platform", "style", "aspect_ratio", "visible_text", "text_policy", "exact_text", "output"):
         if key not in meta:
             fail(errors, f"{path.name}: missing frontmatter field {key}")
 
@@ -111,8 +146,13 @@ def validate_prompt(contract: dict, path: Path) -> list[str]:
     if expected_render_method and meta.get("render_method", "") != expected_render_method:
         fail(errors, f"{path.name}: metadata render_method does not match contract")
 
-    asset_type = meta.get("asset_type", "")
-    if asset_type == "xiaohongshu-cover" and expected_render_method == "imagegen":
+    expected_output = str(contract.get("output", "")).replace("\\", "/").strip()
+    if expected_output and meta.get("output", "").replace("\\", "/") != expected_output:
+        fail(errors, f"{path.name}: metadata output does not match contract")
+
+    asset_type = contract.get("asset_type", meta.get("asset_type", ""))
+    is_xhs_cover = asset_type == "xiaohongshu-cover" or mode == "xiaohongshu-cover" or (contract.get("platform") == "xiaohongshu" and asset_type == "cover")
+    if is_xhs_cover and expected_render_method == "imagegen":
         for key in REQUIRED_XHS_AI_COVER_FIELDS:
             if not meta.get(key, "").strip():
                 fail(errors, f"{path.name}: AI Xiaohongshu cover is missing {key}")
@@ -128,10 +168,12 @@ def validate_prompt(contract: dict, path: Path) -> list[str]:
         fail(errors, f"{path.name}: metadata text_policy does not match contract")
 
     exact_text = str(contract.get("exact_text", ""))
+    if meta.get("exact_text", "") != exact_text:
+        fail(errors, f"{path.name}: metadata exact_text does not match contract")
     if visible_text:
         if not exact_text:
             fail(errors, f"{path.name}: visible_text requires non-empty exact_text")
-        elif exact_text not in text:
+        elif exact_text not in body:
             fail(errors, f"{path.name}: exact_text is absent from prompt")
         if meta.get("visible_text", "").lower() not in {"true", "yes", "1"}:
             fail(errors, f"{path.name}: metadata visible_text is not true")
@@ -139,7 +181,8 @@ def validate_prompt(contract: dict, path: Path) -> list[str]:
             fail(errors, f"{path.name}: visible text cannot use {expected_policy}")
         if not bool(contract.get("allow_textless_fallback", False)):
             for term in CONFLICT_TERMS:
-                if term.lower() in lower:
+                clauses = re.split(r"[\n。；;]", body.lower())
+                if any(term.lower() in clause and not re.search(r"禁止|不得|不要|禁用|avoid\b|do not\b|never\b", clause.split(term.lower())[0]) for clause in clauses):
                     fail(errors, f"{path.name}: forbidden text fallback term {term!r}")
 
         allowed_text = contract.get("allowed_text", [])
@@ -154,7 +197,7 @@ def validate_prompt(contract: dict, path: Path) -> list[str]:
                 fail(errors, f"{path.name}: editorial-hierarchy is missing secondary hierarchy guidance")
         for phrase in allowed_text:
             phrase = str(phrase).strip()
-            if phrase and phrase not in text:
+            if phrase and phrase not in body:
                 fail(errors, f"{path.name}: allowed_text phrase is absent from prompt: {phrase!r}")
     else:
         if meta.get("visible_text", "").lower() in {"true", "yes", "1"}:
@@ -185,7 +228,7 @@ def main() -> int:
             errors.append(f"missing prompt file: {prompt}")
             continue
         try:
-            effective_contract = contract_for_prompt(contract, prompt)
+            effective_contract = contract_for_prompt(contract, prompt, args.contract.resolve().parent)
         except ValueError as error:
             errors.append(str(error))
             continue
