@@ -4,6 +4,10 @@
 
 `article-visual-director` 是一个 Codex Skill，支持公众号、X Article 和小红书的封面、正文配图、多页图文、概念海报，以及信息密集型小红书教程页面。
 
+[![文章视觉导演：让内容长出画面](assets/examples/covers/editorial-system-landscape.jpg)](#封面结构图谱)
+
+[查看 7 张封面案例](#封面结构图谱) · [浏览 7 种视觉风格](#视觉风格图谱)
+
 ## 输出示例
 
 用户输入：
@@ -114,28 +118,51 @@ X Article 横幅，使用同一主题的宽幅构图建立文章入口：
 
 ## 封面结构图谱
 
-视觉风格决定画面的颜色、材质和光线，封面结构决定读者第一眼先看到什么。当前 Skill 内置 7 种封面结构，下面用现有案例展示它们的组织方式。图片是结构示例，同一结构可以换用不同主视觉风格。
+下面是专为本 Skill 制作的 7 张 AI 封面演示，围绕“文章如何变成视觉资产”展开。每张采用独立的场景、配色和阅读入口，点击图片可以查看大图。
 
-<table>
-<tr>
-<td width="50%"><img src="assets/examples/styles/product-hero.png" alt="single-hero 封面结构示例" width="340"><br><code>single-hero</code><br>让一个产品、装置、物体或人物占据视觉中心。适合产品发布、工具介绍和主题明确的文章。</td>
-<td width="50%"><img src="assets/examples/styles/human-story-editorial.png" alt="unfinished-moment 封面结构示例" width="340"><br><code>unfinished-moment</code><br>截取动作即将发生或刚刚发生的瞬间。适合人物故事、文化观察和情绪观点。</td>
-</tr>
-<tr>
-<td width="50%"><img src="assets/examples/styles/concept-metaphor.png" alt="conceptual-tension 封面结构示例" width="340"><br><code>conceptual-tension</code><br>用尺度、材质、方向或空间矛盾表达核心观点。适合行业判断、抽象机制和带有悖论的文章。</td>
-<td width="50%"><img src="assets/examples/styles/warm-workbench-map.png" alt="system-landscape 封面结构示例" width="340"><br><code>system-landscape</code><br>把流程或系统压缩成一个可读的工作台、装置剖面或控制中心，只在封面暗示系统全貌。</td>
-</tr>
-<tr>
-<td width="50%"><img src="assets/examples/styles/high-concept-poster.png" alt="editorial-system-landscape 封面结构示例" width="340"><br><code>editorial-system-landscape</code><br>把文章标题层级和电影化系统场景放在同一画面。适合开源项目、AI 基础设施和复杂工具。</td>
-<td width="50%"><img src="assets/examples/styles/tactile-interface-collage.png" alt="evidence-collage 封面结构示例" width="340"><br><code>evidence-collage</code><br>用少量截图、文件、实物和标注建立证据感。一个证据承担主角，其他元素负责辅助说明。</td>
-</tr>
-<tr>
-<td width="50%"><img src="assets/examples/article-cover-wechat-seedance.png" alt="title-space 封面结构示例" width="340"><br><code>title-space</code><br>让短标题与一个克制主体共享版式空间。适合标题本身有强冲击力的文章。</td>
-<td width="50%"></td>
-</tr>
-</table>
+### 单一主体 · 一篇文章，多种视觉
 
-选择时可以先判断文章需要哪种阅读入口，再叠加主视觉风格和小红书冲击机制。例如“产品发布”可以组合 `product-hero`、`single-hero` 和 `foreground-thrust`；“Skill 教程”可以组合 `warm-workbench-map`、`system-landscape` 和 `giant-type-perspective`；“强观点文章”可以组合 `high-concept-poster`、`conceptual-tension` 和 `single-metaphor`。
+[![单一主体封面：一篇文章，多种视觉](assets/examples/covers/single-hero.jpg)](assets/examples/covers/single-hero.jpg)
+
+`single-hero`：近景展开的纸页占据画面中心，用连续的纸张形态表现同一篇文章可以转成多种视觉资产。适合产品、作品和工具介绍。
+
+### 动作瞬间 · 封面，差这一眼
+
+[![动作瞬间封面：封面，差这一眼](assets/examples/covers/unfinished-moment.jpg)](assets/examples/covers/unfinished-moment.jpg)
+
+`unfinished-moment`：人物抬起红色样张的瞬间，把视线、手部动作和透光纸张连在一起。适合创作经历、人物故事和经验复盘。
+
+### 概念冲突 · 好内容，别埋没
+
+[![概念冲突封面：好内容，别埋没](assets/examples/covers/conceptual-tension.jpg)](assets/examples/covers/conceptual-tension.jpg)
+
+`conceptual-tension`：一张红色封面从灰色纸堆中抽出，用颜色和尺度反差表达内容被看见的机会。适合观点、行业判断和抽象命题。
+
+### 系统场景 · 把文章，做成图文
+
+[![系统场景封面：把文章，做成图文](assets/examples/covers/system-landscape.jpg)](assets/examples/covers/system-landscape.jpg)
+
+`system-landscape`：文字纸带经过微型纸艺印刷机，接续成图文页面。用一个场景暗示输入、转化和输出，适合教程、方法与工作流。
+
+### 编辑型系统场景 · 文章视觉导演
+
+[![编辑型系统场景封面：文章视觉导演](assets/examples/covers/editorial-system-landscape.jpg)](assets/examples/covers/editorial-system-landscape.jpg)
+
+`editorial-system-landscape`：大标题建立文章身份，长卷穿过巨型印框变成山水画面，远景人物强化尺度。适合复杂工具、项目介绍和系统能力拆解。
+
+### 作品证据拼贴 · 封面，拿作品说话
+
+[![作品证据拼贴封面：封面，拿作品说话](assets/examples/covers/evidence-collage.jpg)](assets/examples/covers/evidence-collage.jpg)
+
+`evidence-collage`：将本组已生成的蓝色纸页封面和红色概念封面作为样张素材，重新生成实物拼贴场景。适合展示作品与交付成果；界面证据类封面另需使用原始截图。
+
+### 标题与主体共享空间 · 让封面，抓住第一眼
+
+[![标题与主体共享空间封面：让封面，抓住第一眼](assets/examples/covers/title-space.jpg)](assets/examples/covers/title-space.jpg)
+
+`title-space`：荧光黄底色与黑色巨字建立第一视觉层级，一条胶片穿过文字留白。适合短标题、视觉宣言和强观点。
+
+视觉风格决定颜色、材质与光线，封面结构决定第一眼的阅读入口。比如人物摄影可以使用动作瞬间，暖色纸艺可以使用系统场景，高概念海报可以使用概念冲突或标题主导的版式。
 
 ## 适用场景
 
@@ -257,6 +284,7 @@ Copy-Item -Recurse -LiteralPath ".\article-visual-director" -Destination "$env:U
 | `references/` | 平台策略、风格库、页面结构和质量规则 |
 | `assets/examples/` | README 使用的公开案例图 |
 | `assets/examples/styles/` | 7 种主风格的公开示例图 |
+| `assets/examples/covers/` | 7 种封面结构的 AI 成图案例 |
 | `scripts/validate_prompt_contract.py` | 校验图片提示词与需求契约 |
 | `scripts/render_html_pages.ps1` | 将教程 HTML 页面渲染为 PNG |
 | `scripts/check_xiaohongshu_copy.py` | 检查作者第一人称文案中的旁观转述话术 |
