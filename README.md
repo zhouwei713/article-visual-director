@@ -56,60 +56,59 @@ qa.md
 
 ## 案例图集
 
-下面是最近使用本 Skill 产出的案例图，用来展示不同任务的视觉组织方式。图片属于案例展示，不代表平台发布效果或传播结果。
+下面展示文章封面、正文配图、概念海报与小红书图文。横幅与概念海报按原主题重新设计，信息图和教程保留案例内容；点击图片可查看高清版本。
 
 ### 文章封面
 
-公众号封面，使用电影胶片、纸张和轨道表达视频提示词到拍摄方案的转换：
+公众号封面采用近景纸页与胶片转化，暖色放映光把标题、镜头序列和摄影轨道连在一起：
 
-<p><img src="assets/examples/article-cover-wechat-seedance.png" alt="公众号文章封面案例" width="820"></p>
+[![公众号封面：提示词变成拍摄方案](assets/examples/article-cover-wechat-seedance.png)](assets/examples/article-cover-wechat-seedance.png)
 
-X Article 横幅，使用同一主题的宽幅构图建立文章入口：
+X Article 横幅重新安排胶片弧线与标题留白，在 5:2 画幅里保留连续的电影场景：
 
-<p><img src="assets/examples/article-cover-x-seedance.png" alt="X Article 封面案例" width="820"></p>
+[![X Article 横幅：提示词变成拍摄方案](assets/examples/article-cover-x-seedance.png)](assets/examples/article-cover-x-seedance.png)
 
 ### 文章配图与概念海报
 
-正文配图把输入对象、三条工作路径和交付结果放在同一张图里：
+正文配图使用高清原图，将输入对象、三条工作路径和交付结果放在同一张图里；点击可查看细节：
 
-<p><img src="assets/examples/article-illustration-ai-office.png" alt="文章正文配图案例" width="820"></p>
+[![正文配图：办公 Agent 的三条工作路径](assets/examples/article-illustration-ai-office.png)](assets/examples/article-illustration-ai-office.png)
 
-概念海报用模块拆分和光线路径表现复杂工具的结构关系：
+概念海报用可拆装的巨型环与连续光线，表达模块接入后形成完整工作路径的关系：
 
-<p><img src="assets/examples/concept-poster-deepseek.png" alt="概念海报案例" width="820"></p>
+[![概念海报：把能力接起来](assets/examples/concept-poster-deepseek.png)](assets/examples/concept-poster-deepseek.png)
 
 ### 小红书图文
 
-小红书封面优先使用 AI 生图来承担第一眼冲击，信息密集内页使用确定性排版：
+小红书 AI 封面用巨字透视、人物与跨地域场景建立第一眼冲击。保留这张已选案例，以高清版本展示：
 
-<table>
-<tr>
-<td><img src="assets/examples/xiaohongshu-cover-seko.png" alt="小红书 AI 封面案例" width="330"></td>
-<td><img src="assets/examples/xiaohongshu-inner-seko.png" alt="小红书 HTML 内页案例" width="330"></td>
-</tr>
-</table>
+<p><a href="assets/examples/xiaohongshu-cover-seko.png"><img src="assets/examples/xiaohongshu-cover-seko.png" alt="短剧出海 AI 封面" width="600"></a></p>
 
-左图是 AI 封面，右图是同一图文包中的 HTML 内页。两者共享颜色、材质和标题气质，分别承担点击和信息阅读任务。
+同一图文包的 HTML 教程内页保留原始操作截图和说明，独立展示，点击可看 1080×1440 原图：
+
+<p><a href="assets/examples/xiaohongshu-inner-seko.png"><img src="assets/examples/xiaohongshu-inner-seko.png" alt="短剧出海教程内页与操作截图" width="720"></a></p>
+
+封面负责主题识别，内页负责操作理解，两者共享深色底、暖色强调和明确标题层级。
 
 ## 视觉风格图谱
 
-当前 Skill 内置 7 种主风格。每种风格都有独立的视觉锚点、材质和适用任务，执行时会根据文章内容选择，让不同主题拥有相匹配的视觉语言。
+当前 Skill 内置 7 种主风格。下面用全新原创成图展示人物摄影、产品主体、概念纸艺、工作台、深色系统、触觉拼贴与文字海报的区别。每种风格都有独立的材质、光线与适用任务，点击图片可放大。
 
 <table>
 <tr>
-<td width="50%"><img src="assets/examples/styles/human-story-editorial.png" alt="human-story-editorial 风格示例" width="340"><br><code>human-story-editorial</code><br>人物经历、文化观察和情绪观点。强调成年原创人物、真实环境光和未完成动作。</td>
-<td width="50%"><img src="assets/examples/styles/product-hero.png" alt="product-hero 风格示例" width="340"><br><code>product-hero</code><br>AI 工具、产品介绍和功能发布。强调一个产品主体、使用场景和输入到结果的视觉路径。</td>
+<td width="50%"><a href="assets/examples/styles/human-story-editorial.png"><img src="assets/examples/styles/human-story-editorial.png" alt="human-story-editorial 风格示例" width="380"></a><br><code>human-story-editorial</code><br>人物经历、文化观察和情绪观点。雨夜列车、旧照片和人物视线留下叙事悬念。</td>
+<td width="50%"><a href="assets/examples/styles/product-hero.png"><img src="assets/examples/styles/product-hero.png" alt="product-hero 风格示例" width="380"></a><br><code>product-hero</code><br>产品介绍和功能发布。原创红色装置成为主体，纸张输入与图像输出解释用途。</td>
 </tr>
 <tr>
-<td width="50%"><img src="assets/examples/styles/concept-metaphor.png" alt="concept-metaphor 风格示例" width="340"><br><code>concept-metaphor</code><br>行业判断、抽象观点和趋势分析。用一个可解释的隐喻承载尺度、方向或材质冲突。</td>
-<td width="50%"><img src="assets/examples/styles/warm-workbench-map.png" alt="warm-workbench-map 风格示例" width="340"><br><code>warm-workbench-map</code><br>教程、Skill、方法论和工作流。用暖白工作台、便签和路径标记把复杂步骤放进真实语境。</td>
+<td width="50%"><a href="assets/examples/styles/concept-metaphor.png"><img src="assets/examples/styles/concept-metaphor.png" alt="concept-metaphor 风格示例" width="380"></a><br><code>concept-metaphor</code><br>行业判断、抽象观点和趋势分析。平面红纸折成立体形状，让观点获得可见的形态。</td>
+<td width="50%"><a href="assets/examples/styles/warm-workbench-map.png"><img src="assets/examples/styles/warm-workbench-map.png" alt="warm-workbench-map 风格示例" width="380"></a><br><code>warm-workbench-map</code><br>教程、Skill、方法论和工作流。暖木桌面、折页与连接纸带把草稿、样张和成品串起来。</td>
 </tr>
 <tr>
-<td width="50%"><img src="assets/examples/styles/dark-system-pulse.png" alt="dark-system-pulse 风格示例" width="340"><br><code>dark-system-pulse</code><br>自动化、代码、基础设施和安全。用深灰设备、信号路径和少量强调色表现系统状态。</td>
-<td width="50%"><img src="assets/examples/styles/tactile-interface-collage.png" alt="tactile-interface-collage 风格示例" width="340"><br><code>tactile-interface-collage</code><br>内容生产、创意工具、媒体产品和社交传播。用纸张、透明片、界面和实体道具建立触觉层次。</td>
+<td width="50%"><a href="assets/examples/styles/dark-system-pulse.png"><img src="assets/examples/styles/dark-system-pulse.png" alt="dark-system-pulse 风格示例" width="380"></a><br><code>dark-system-pulse</code><br>自动化、基础设施和系统状态。接点闭合、铜线脉冲与指示灯表现工作开始的瞬间。</td>
+<td width="50%"><a href="assets/examples/styles/tactile-interface-collage.png"><img src="assets/examples/styles/tactile-interface-collage.png" alt="tactile-interface-collage 风格示例" width="380"></a><br><code>tactile-interface-collage</code><br>内容生产、创意工具和社交传播。撕纸、照片、样张和夹子建立蓝红交错的触觉层次。</td>
 </tr>
 <tr>
-<td width="50%"><img src="assets/examples/styles/high-concept-poster.png" alt="high-concept-poster 风格示例" width="340"><br><code>high-concept-poster</code><br>强观点、发布宣言和主文字驱动的海报。让短标题成为视觉核心，再用一个隐喻关系制造第二眼理解。</td>
+<td width="50%"><a href="assets/examples/styles/high-concept-poster.png"><img src="assets/examples/styles/high-concept-poster.png" alt="high-concept-poster 风格示例" width="380"></a><br><code>high-concept-poster</code><br>强观点、发布宣言和文字主导海报。荧光黄、黑色巨字与折起的边框共同表达突破限制。</td>
 <td width="50%"></td>
 </tr>
 </table>
